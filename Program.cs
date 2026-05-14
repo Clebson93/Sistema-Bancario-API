@@ -21,11 +21,8 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 
-// Adicionando seus serviços (Verifique se TransacaoService e AuthService existem na sua pasta Services)
+// Serviços do Banco
 builder.Services.AddScoped<ContaService>();
-// Se você tiver esses outros serviços, descomente as linhas abaixo:
-// builder.Services.AddScoped<AuthService>();
-// builder.Services.AddScoped<TransacaoService>();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -83,8 +80,29 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// ============================================================
+// 4. CONFIGURAÇÃO DO PIPELINE (ORDEM IMPORTANTE)
+// ============================================================
+
+// Habilita o Front-end (wwwroot) como prioridade máxima
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+// Swagger configurado para não "atropelar" a página inicial
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Banco Único API v1");
+    // Removido o RoutePrefix = string.Empty para liberar a home para o HTML
+});
+
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+
 // ==============================================================================
-// 🔥 4. BLOCO DE CRIAÇÃO AUTOMÁTICA E SEED
+// 5. BLOCO DE CRIAÇÃO AUTOMÁTICA E SEED
 // ==============================================================================
 using (var scope = app.Services.CreateScope())
 {
@@ -131,25 +149,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ============================================================
-// 5. CONFIGURAÇÃO DO PIPELINE (AJUSTADO PARA DEPLOY)
-// ============================================================
-
-// Swagger agora fica fora do "if Development" para o recrutador ver online
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Banco Único API v1");
-    c.RoutePrefix = string.Empty; // Faz a API abrir direto no Swagger
-});
-
-app.UseHttpsRedirection();
-app.UseDefaultFiles();
-app.UseStaticFiles();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
-
-// Configuração de Porta Dinâmica para Nuvem (Render/Azure)
+// Configuração de Porta Dinâmica para a Railway
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
 app.Run($"http://0.0.0.0:{port}");
