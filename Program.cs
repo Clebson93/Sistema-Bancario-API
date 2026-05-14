@@ -10,8 +10,18 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // ============================================================
-// 1. CONFIGURAÇÃO DOS SERVIÇOS
+// 1. CONFIGURAÇÃO DOS SERVIÇOS E CORS
 // ============================================================
+
+// LIBERAÇÃO DO CORS (Para o botão de login funcionar no navegador)
+builder.Services.AddCors(options => {
+    options.AddPolicy("LiberarGeral", policy => {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -20,8 +30,6 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddEndpointsApiExplorer();
-
-// Serviços do Banco
 builder.Services.AddScoped<ContaService>();
 
 builder.Services.AddSwaggerGen(c =>
@@ -48,11 +56,11 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // ============================================================
-// 2. CONEXÃO COM BANCO DE DADOS (MYSQL)
+// 2. CONEXÃO COM BANCO DE DADOS (SQLITE - Roda na Nuvem)
 // ============================================================
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// Usando SQLite para garantir que o projeto rode na Railway sem custos extras
 builder.Services.AddDbContext<BancoDigitalDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+    options.UseSqlite("Data Source=banco.db")
 );
 
 // ============================================================
@@ -81,19 +89,21 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 // ============================================================
-// 4. CONFIGURAÇÃO DO PIPELINE (ORDEM IMPORTANTE)
+// 4. CONFIGURAÇÃO DO PIPELINE (A ORDEM AQUI É TUDO)
 // ============================================================
 
-// Habilita o Front-end (wwwroot) como prioridade máxima
+// 1. Aplica a liberação de acesso (CORS)
+app.UseCors("LiberarGeral");
+
+// 2. Ativa o Front-end (pasta wwwroot)
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-// Swagger configurado para não "atropelar" a página inicial
+// 3. Documentação técnica em /swagger
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Banco Único API v1");
-    // Removido o RoutePrefix = string.Empty para liberar a home para o HTML
 });
 
 app.UseHttpsRedirection();
@@ -102,7 +112,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // ==============================================================================
-// 5. BLOCO DE CRIAÇÃO AUTOMÁTICA E SEED
+// 5. CRIAÇÃO AUTOMÁTICA DO BANCO E USUÁRIOS (Gabriel e Marcelo)
 // ==============================================================================
 using (var scope = app.Services.CreateScope())
 {
@@ -110,6 +120,8 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<BancoDigitalDbContext>();
+
+        // Garante que o arquivo banco.db será criado se não existir
         context.Database.EnsureCreated();
 
         if (!context.Agencias.Any())
@@ -145,10 +157,10 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Console.WriteLine($">>> ERRO NA INICIALIZAÇÃO: {ex.Message}");
+        Console.WriteLine($">>> ERRO AO INICIALIZAR O BANCO: {ex.Message}");
     }
 }
 
-// Configuração de Porta Dinâmica para a Railway
+// Configuração para rodar na porta correta da Railway
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
 app.Run($"http://0.0.0.0:{port}");
