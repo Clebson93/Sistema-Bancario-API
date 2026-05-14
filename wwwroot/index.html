@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+				<title>Banco Único</title>
+				<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+					<style>
+						*{padding:0; margin:0; border: 0; box-sizing:border-box;}
+						body{font-family:'Segoe UI',sans-serif;background:#f0f2f5;margin:0;}
+						.navbar{background:#0A1628!important;border-bottom:3px solid #C9A84C;}
+						.hero{background:#0A1628;color:white;padding:48px 0 70px;border-bottom:4px solid #C9A84C;}
+						.hero h1{font-size:32px;font-weight:800;margin:0 0 6px;}
+						.hero p{font-size:16px;opacity:0.75;margin:0;}
+						.btn-primary{background:#C9A84C;border-color:#C9A84C;color:#0A1628;font-weight:700;}
+						.btn-primary:hover{background:#b8943d;border-color:#b8943d;color:#0A1628;}
+						.stat-card{background:#0A1628;color:white;border-radius:12px;padding:20px 24px;border-left:4px solid #C9A84C;}
+						.stat-card .numero{font-size:28px;font-weight:800;color:#C9A84C;line-height:1;}
+						.stat-card .rotulo{font-size:12px;opacity:0.65;margin-top:4px;}
+						.menu-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+						.menu-tab{padding:10px 20px;border-radius:8px;border:1.5px solid #ddd;background:white;cursor:pointer;font-weight:600;font-size:14px;color:#555;transition:all 0.15s;}
+						.menu-tab:hover{border-color:#C9A84C;color:#0A1628;}
+						.menu-tab.ativo{background:#0A1628;color:#C9A84C;border-color:#0A1628;}
+						.secao{background:white;border-radius:16px;padding:28px;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+						.secao-titulo{font-size:18px;font-weight:700;color:#0A1628;margin:0 0 4px;}
+						.secao-sub{font-size:13px;color:#999;margin:0 0 20px;}
+						.table th{background:#f8f9fa;font-size:11px;color:#999;text-transform:uppercase;letter-spacing:0.5px;border:none;padding:10px 12px;}
+						.table td{vertical-align:middle;border-color:#f0f0f0;padding:12px;}
+						.badge-pill{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600;display:inline-block;}
+						.score-bronze{background:#CD7F32;color:white;}
+						.tipo-deposito{background:#d4edda;color:#155724;}
+						.tipo-saque{background:#f8d7da;color:#721c24;}
+						.tipo-transferencia{background:#e8f0fe;color:#1a3a6b;}
+						.btn-sm-acao{border-radius:6px;padding:3px 12px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid;}
+						.btn-del{border-color:#dc3545;color:#dc3545;background:none;}
+						.btn-del:hover{background:#dc3545;color:white;}
+						.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0A1628;height:fit-content;}
+						.login-card{background:white;border-radius:20px;padding:48px 40px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,0.4);}
+						.login-card h2{font-weight:800;color:#0A1628;text-align:center;margin-bottom:4px;}
+						.login-card p{color:#888;text-align:center;margin-bottom:28px;}
+						.form-control:focus{border-color:#C9A84C;box-shadow:0 0 0 0.2rem rgba(201,168,76,0.2);}
+						.modal-content{border-radius:16px;border:none;}
+						#container-logo-login{display:flex;justify-content:center;}
+						#logo-login{width:50%;height:50%;}
+						#container-logo-dash{width:30%;display:flex;justify-content:center;}
+						#logo-dash{width:35%;height:35%;}
+						.nav-link-logout{color:#C9A84C !important;font-weight:bold;cursor:pointer;}
+						.destinatario-card{background:#f0f7ff;border:1.5px solid #C9A84C;border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+						.destinatario-card .avatar{width:40px;height:40px;border-radius:50%;background:#0A1628;color:#C9A84C;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0;}
+						.destinatario-card .info .nome{font-weight:700;color:#0A1628;font-size:15px;}
+						.destinatario-card .info .cpf{font-size:12px;color:#888;}
+						.btn-buscar{border-radius:0 8px 8px 0;background:#0A1628;color:#C9A84C;border:none;padding:0 16px;font-weight:700;cursor:pointer;}
+						.btn-buscar:hover{background:#C9A84C;color:#0A1628;}
+					</style>
+				</head>
+	<body>
+
+		<!-- LOGIN -->
+		<div id="loginPage">
+			<div class="login-wrap">
+				<div class="login-card">
+					<div id="container-logo-login">
+						<img id="logo-login" src="logo.png" alt="Banco Único">
+      </div>
+					<h2 id="loginTitle">Bem-vindo</h2>
+					<p id="loginSub" style="margin:0 0 10px">Acesse sua conta</p>
+					<div class="mb-3">
+						<label class="form-label fw-semibold" id="labelUser">CPF</label>
+						<input id="username" class="form-control form-control-lg" placeholder="Digite seu CPF">
+      </div>
+					<div class="mb-4">
+						<label class="form-label fw-semibold">Senha</label>
+						<input id="password" type="password" class="form-control form-control-lg" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter')fazerLogin()">
+      </div>
+					<button class="btn btn-primary w-100 btn-lg" onclick="fazerLogin()">Entrar</button>
+					<div class="mt-3 text-center">
+						<a href="#" onclick="toggleLoginMode()" id="btnToggleMode" style="color:#C9A84C;text-decoration:none;font-size:14px;">Acesso Administrativo</a>
+					</div>
+					<div class="mt-2 text-center">
+						<a href="#" data-bs-toggle="modal" data-bs-target="#modalRegister" style="color:#0A1628;text-decoration:none;font-size:14px;">Não tem conta? Cadastre-se</a>
+					</div>
+					<p id="loginErro" class="text-danger mt-3 text-center d-none">Credenciais incorretas.</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- PAINEL ADMIN -->
+		<div id="painelAdmin" class="d-none">
+			<nav class="navbar navbar-dark px-4">
+				<span class="navbar-brand">Banco Único - Admin</span>
+				<span class="nav-link-logout" onclick="logout()">Sair</span>
+			</nav>
+			<div class="hero">
+				<div class="container">
+					<div id="container-logo-dash">
+						<img id="logo-dash" src="logo-dash.png" alt="Banco Único">
+					</div>
+					<h1>Painel Administrativo</h1>
+					<p>Gerencie clientes, contas e transações do Banco Único.</p>
+				</div>
+			</div>
+			<div class="container" style="margin-top:-28px;padding-bottom:48px;">
+				<div class="row g-3 mb-4">
+					<div class="col-6 col-md-3">
+						<div class="stat-card">
+							<div class="numero" id="stClientes">—</div>
+							<div class="rotulo">Clientes</div>
+						</div>
+					</div>
+					<div class="col-6 col-md-3">
+						<div class="stat-card">
+							<div class="numero" id="stContas">—</div>
+							<div class="rotulo">Contas</div>
+						</div>
+					</div>
+					<div class="col-6 col-md-3">
+						<div class="stat-card">
+							<div class="numero" id="stTransacoes">—</div>
+							<div class="rotulo">Transações</div>
+						</div>
+					</div>
+					<div class="col-6 col-md-3">
+						<div class="stat-card">
+							<div class="numero" id="stAgencias">—</div>
+							<div class="rotulo">Agências</div>
+						</div>
+					</div>
+				</div>
+				<div class="menu-tabs">
+					<button class="menu-tab ativo" id="tab-clientes" onclick="mostrarSecao('clientes')">👥 Clientes</button>
+					<button class="menu-tab" id="tab-contas" onclick="mostrarSecao('contas')">🏦 Contas</button>
+					<button class="menu-tab" id="tab-transacoes" onclick="mostrarSecao('transacoes')">💸 Transações</button>
+					<button class="menu-tab" id="tab-agencias" onclick="mostrarSecao('agencias')">📍 Agências</button>
+				</div>
+				<div id="sec-clientes" class="secao">
+					<div class="d-flex justify-content-between align-items-start mb-3">
+						<div>
+							<p class="secao-titulo">Clientes</p>
+							<p class="secao-sub">Lista de todos os clientes cadastrados</p>
+						</div>
+						<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCliente">+ Novo Cliente</button>
+					</div>
+					<div class="table-responsive">
+						<table class="table table-hover mb-0">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>Nome</th>
+									<th>CPF</th>
+									<th>Email</th>
+									<th>Score</th>
+									<th>Ações</th>
+								</tr>
+							</thead>
+							<tbody id="tbClientes"></tbody>
+						</table>
+					</div>
+				</div>
+				<div id="sec-contas" class="secao d-none">
+					<p class="secao-titulo">Contas</p>
+					<p class="secao-sub">Saldo, tipo e status de cada conta</p>
+					<div class="table-responsive">
+						<table class="table table-hover mb-0">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>Número</th>
+									<th>Titular</th>
+									<th>Tipo</th>
+									<th>Saldo</th>
+									<th>Status</th>
+									<th>Abertura</th>
+								</tr>
+							</thead>
+							<tbody id="tbContas"></tbody>
+						</table>
+					</div>
+				</div>
+				<div id="sec-transacoes" class="secao d-none">
+					<p class="secao-titulo">Transações</p>
+					<p class="secao-sub">Histórico global do sistema</p>
+					<div class="table-responsive">
+						<table class="table table-hover mb-0">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>Tipo</th>
+									<th>Valor</th>
+									<th>Data/Hora</th>
+									<th>Origem</th>
+									<th>Destino</th>
+								</tr>
+							</thead>
+							<tbody id="tbTransacoes"></tbody>
+						</table>
+					</div>
+				</div>
+				<div id="sec-agencias" class="secao d-none">
+					<p class="secao-titulo">Agências</p>
+					<p class="secao-sub">Lista de agências cadastradas</p>
+					<div class="table-responsive">
+						<table class="table table-hover mb-0">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>Nome</th>
+									<th>Endereço</th>
+									<th>Cidade</th>
+									<th>Estado</th>
+								</tr>
+							</thead>
+							<tbody id="tbAgencias"></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- PAINEL CLIENTE -->
+		<div id="painelCliente" class="d-none">
+			<nav class="navbar navbar-dark px-4">
+				<span class="navbar-brand">Banco Único - Cliente</span>
+				<span class="nav-link-logout" onclick="logout()">Sair</span>
+			</nav>
+			<div class="hero">
+				<div class="container">
+					<h1 id="cliNome">Olá, Cliente</h1>
+					<p>Bem-vindo ao seu Internet Banking.</p>
+				</div>
+			</div>
+			<div class="container" style="margin-top:-28px;padding-bottom:48px;">
+				<div class="row g-3 mb-4">
+					<div class="col-12 col-md-6">
+						<div class="stat-card">
+							<div class="numero" id="cliSaldo">R$ 0,00</div>
+							<div class="rotulo">
+								Saldo Disponível - Conta <span id="cliContaNum">...</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 col-md-6">
+						<div class="secao h-100 py-3">
+							<p class="fw-bold mb-2">Ações Rápidas</p>
+							<div class="d-flex gap-2">
+								<button class="btn btn-outline-primary btn-sm" onclick="abrirModalTransacao('Deposito')">Depositar</button>
+								<button class="btn btn-outline-primary btn-sm" onclick="abrirModalTransacao('Saque')">Sacar</button>
+								<button class="btn btn-outline-primary btn-sm" onclick="abrirModalTransacao('Transferencia')">Transferir</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="secao">
+					<p class="secao-titulo">Minhas Transações</p>
+					<p class="secao-sub">Histórico recente da sua conta</p>
+					<div class="table-responsive">
+						<table class="table table-hover mb-0">
+							<thead>
+								<tr>
+									<th>Tipo</th>
+									<th>Valor</th>
+									<th>Data</th>
+									<th>Detalhes</th>
+								</tr>
+							</thead>
+							<tbody id="tbMinhasTransacoes"></tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal Registro -->
+		<div class="modal fade" id="modalRegister" tabindex="-1">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header border-0 pb-0">
+						<h5 class="modal-title fw-bold">Criar Conta</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body p-4">
+						<div class="mb-3">
+							<label class="form-label fw-semibold">Nome Completo</label>
+							<input id="r_nome" class="form-control">
+						</div>
+						<div class="mb-3">
+							<label class="form-label fw-semibold">CPF</label>
+							<input id="r_cpf" class="form-control" maxlength="11">
+						</div>
+						<div class="mb-3">
+							<label class="form-label fw-semibold">Email</label>
+							<input id="r_email" class="form-control">
+						</div>
+						<div class="mb-4">
+							<label class="form-label fw-semibold">Senha</label>
+							<input id="r_senha" type="password" class="form-control">
+						</div>
+						<button class="btn btn-primary w-100 btn-lg fw-bold" onclick="registrarCliente()">Cadastrar</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal Transação -->
+		<div class="modal fade" id="modalTransacao" tabindex="-1">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header border-0 pb-0">
+						<h5 class="modal-title fw-bold" id="transTitle">Transação</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body p-4">
+						<input type="hidden" id="transTipo">
+							<div class="mb-3">
+								<label class="form-label fw-semibold">Valor</label>
+								<input id="transValor" type="number" step="0.01" class="form-control" placeholder="0.00">
+        </div>
+
+							<!-- Seção Pix (só aparece na transferência) -->
+							<div id="divDestino" class="d-none">
+								<label class="form-label fw-semibold">CPF do Destinatário</label>
+								<div class="input-group mb-3">
+									<input id="transDestino" type="text" class="form-control" placeholder="Somente números (11 dígitos)" maxlength="11">
+										<button class="btn-buscar" onclick="buscarDestinatario()">Buscar</button>
+									</div>
+								<!-- Card do destinatário (aparece após busca) -->
+								<div id="destinatarioCard" class="destinatario-card d-none">
+									<div class="avatar" id="destinatarioAvatar">?</div>
+									<div class="info">
+										<div class="nome" id="destinatarioNome">—</div>
+										<div class="cpf" id="destinatarioCpf">—</div>
+									</div>
+								</div>
+							</div>
+
+							<button class="btn btn-primary w-100 btn-lg fw-bold" onclick="executarTransacao()">Confirmar</button>
+						</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal Novo Cliente (Admin) -->
+		<div class="modal fade" id="modalCliente" tabindex="-1">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header border-0 pb-0">
+						<h5 class="modal-title fw-bold">Novo Cliente</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+					</div>
+					<div class="modal-body p-4">
+						<div class="mb-3">
+							<label class="form-label fw-semibold">Nome completo</label>
+							<input id="c_nome" class="form-control">
+						</div>
+						<div class="mb-3">
+							<label class="form-label fw-semibold">CPF</label>
+							<input id="c_cpf" class="form-control" maxlength="11">
+						</div>
+						<div class="mb-4">
+							<label class="form-label fw-semibold">Email</label>
+							<input id="c_email" class="form-control">
+						</div>
+						<button class="btn btn-primary w-100 btn-lg fw-bold" onclick="salvarCliente()">Salvar Cliente</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+		<script>
+			let token = null;
+			let userRole = null;
+			let loginMode = 'Cliente';
+			let clienteData = null;
+			let destinatarioEncontrado = null;
+
+			const h = () => ({ 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' });
+
+			function toggleLoginMode() {
+			loginMode = loginMode === 'Cliente' ? 'Admin' : 'Cliente';
+			document.getElementById('loginTitle').textContent = loginMode === 'Admin' ? 'Administração' : 'Bem-vindo';
+			document.getElementById('loginSub').textContent = loginMode === 'Admin' ? 'Acesso restrito' : 'Acesse sua conta';
+			document.getElementById('labelUser').textContent = loginMode === 'Admin' ? 'Usuário' : 'CPF';
+			document.getElementById('username').placeholder = loginMode === 'Admin' ? 'Digite seu usuário' : 'Digite seu CPF';
+			document.getElementById('btnToggleMode').textContent = loginMode === 'Admin' ? 'Acesso Cliente' : 'Acesso Administrativo';
+			}
+
+			async function fazerLogin() {
+			const u = document.getElementById('username').value;
+			const p = document.getElementById('password').value;
+			const body = loginMode === 'Admin' ? { username: u, password: p } : { cpf: u, password: p };
+			const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+			if (!res.ok) { document.getElementById('loginErro').classList.remove('d-none'); return; }
+			const data = await res.json();
+			token = data.token;
+			userRole = data.role;
+			document.getElementById('loginPage').classList.add('d-none');
+			if (userRole === 'Admin') {
+			document.getElementById('painelAdmin').classList.remove('d-none');
+			mostrarSecao('clientes');
+			carregarStats();
+			} else {
+			document.getElementById('painelCliente').classList.remove('d-none');
+			await carregarDadosCliente();
+			}
+			}
+
+			function logout() {
+			token = null; userRole = null; clienteData = null; destinatarioEncontrado = null;
+			document.getElementById('painelAdmin').classList.add('d-none');
+			document.getElementById('painelCliente').classList.add('d-none');
+			document.getElementById('loginPage').classList.remove('d-none');
+			}
+
+			async function carregarDadosCliente() {
+			const res = await fetch('/api/clientes/meu-perfil', { headers: h() });
+			if (!res.ok) return;
+			clienteData = await res.json();
+			document.getElementById('cliNome').textContent = 'Olá, ' + (clienteData.nome || 'Cliente');
+			if (clienteData.contas && clienteData.contas.length > 0) {
+			const conta = clienteData.contas[0];
+			document.getElementById('cliSaldo').textContent = 'R$ ' + (conta.saldo || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+			document.getElementById('cliContaNum').textContent = conta.numeroConta || '—';
+			}
+			carregarMinhasTransacoes();
+			}
+
+			async function carregarMinhasTransacoes() {
+			const res = await fetch('/api/transacoes/minhas', { headers: h() });
+			if (!res.ok) return;
+			const list = await res.json();
+			const tb = document.getElementById('tbMinhasTransacoes');
+			tb.innerHTML = list.map(t => {
+			const tipo = t.tipoTransacao;
+			const tcls = tipo === 'Deposito' ? 'tipo-deposito' : tipo === 'Saque' ? 'tipo-saque' : 'tipo-transferencia';
+			return `<tr>
+				<td>
+					<span class="badge-pill ${tcls}">${tipo}</span>
+				</td>
+				<td class="fw-bold">R$ ${t.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+				<td class="text-muted">${new Date(t.dataHora).toLocaleString('pt-BR')}</td>
+				<td class="small">${tipo === 'Transferencia' ? (t.contaDestinoId ? 'Para Conta #' + t.contaDestinoId : 'Recebido') : '—'}</td>
+			</tr>`;
+			}).join('');
+			}
+
+			function abrirModalTransacao(tipo) {
+			if (!clienteData || !clienteData.contas || clienteData.contas.length === 0) {
+			alert('Dados da conta não carregados. Tente recarregar a página.');
+			return;
+			}
+			destinatarioEncontrado = null;
+			document.getElementById('transTipo').value = tipo;
+			document.getElementById('transTitle').textContent = tipo === 'Transferencia' ? '🔑 Pix - Transferência' : tipo;
+			document.getElementById('divDestino').classList.toggle('d-none', tipo !== 'Transferencia');
+			document.getElementById('transValor').value = '';
+			document.getElementById('transDestino').value = '';
+			document.getElementById('destinatarioCard').classList.add('d-none');
+			new bootstrap.Modal(document.getElementById('modalTransacao')).show();
+			}
+
+			async function buscarDestinatario() {
+			const cpf = document.getElementById('transDestino').value.replace(/\D/g, '');
+			if (cpf.length !== 11) { alert('Digite um CPF válido com 11 dígitos.'); return; }
+
+			const res = await fetch(`/api/clientes/buscar-por-cpf/${cpf}`, { headers: h() });
+			const card = document.getElementById('destinatarioCard');
+
+			if (!res.ok) {
+			destinatarioEncontrado = null;
+			card.classList.add('d-none');
+			alert('CPF não encontrado no Banco Único.');
+			return;
+			}
+
+			const data = await res.json();
+			destinatarioEncontrado = data;
+
+			document.getElementById('destinatarioAvatar').textContent = data.nome.charAt(0).toUpperCase();
+			document.getElementById('destinatarioNome').textContent = data.nome;
+			document.getElementById('destinatarioCpf').textContent = 'CPF: ' + cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+			card.classList.remove('d-none');
+			}
+
+			async function executarTransacao() {
+			if (!clienteData || !clienteData.contas || clienteData.contas.length === 0) {
+			alert('Erro: Dados da conta não encontrados.');
+			return;
+			}
+
+			const tipo = document.getElementById('transTipo').value;
+			const valor = parseFloat(document.getElementById('transValor').value);
+			if (isNaN(valor) || valor <= 0) { alert('Informe um valor válido.'); return; }
+
+			const rotas = { 'Deposito': 'depositar', 'Saque': 'sacar', 'Transferencia': 'transferir' };
+			const contaId = clienteData.contas[0].id;
+			const url = '/api/transacoes/' + rotas[tipo];
+			let body = { valor };
+
+			if (tipo === 'Transferencia') {
+			if (!destinatarioEncontrado) {
+			alert('Busque e confirme o destinatário antes de transferir.');
+			return;
+			}
+			body.contaOrigemId = contaId;
+			body.cpfDestino = document.getElementById('transDestino').value.replace(/\D/g, '');
+			} else {
+			body.contaId = contaId;
+			}
+
+			const res = await fetch(url, { method: 'POST', headers: h(), body: JSON.stringify(body) });
+			const result = res.headers.get('content-type')?.includes('application/json') ? await res.json() : {};
+
+			if (!res.ok) {
+			alert(result.message || 'Erro na operação');
+			} else {
+			bootstrap.Modal.getInstance(document.getElementById('modalTransacao')).hide();
+			await carregarDadosCliente();
+			}
+			}
+
+			async function registrarCliente() {
+			const nome = document.getElementById('r_nome').value;
+			const cpf = document.getElementById('r_cpf').value;
+			const email = document.getElementById('r_email').value;
+			const senha = document.getElementById('r_senha').value;
+			const res = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, cpf, email, senha }) });
+			if (!res.ok) { alert('Erro ao registrar. Verifique os dados.'); }
+			else { alert('Cadastro realizado! Agora faça login.'); bootstrap.Modal.getInstance(document.getElementById('modalRegister')).hide(); }
+			}
+
+			async function carregarStats() {
+			try {
+			const [c, ct, t, a] = await Promise.all([
+			fetch('/api/clientes', { headers: h() }).then(r => r.json()),
+			fetch('/api/contas', { headers: h() }).then(r => r.json()),
+			fetch('/api/transacoes', { headers: h() }).then(r => r.json()),
+			fetch('/api/agencias', { headers: h() }).then(r => r.json())
+			]);
+			document.getElementById('stClientes').textContent = c.length || 0;
+			document.getElementById('stContas').textContent = ct.length || 0;
+			document.getElementById('stTransacoes').textContent = t.length || 0;
+			document.getElementById('stAgencias').textContent = a.length || 0;
+			} catch (e) {}
+			}
+
+			function mostrarSecao(s) {
+			['clientes', 'contas', 'transacoes', 'agencias'].forEach(x => {
+			document.getElementById('sec-' + x).classList.add('d-none');
+			document.getElementById('tab-' + x).classList.remove('ativo');
+			});
+			document.getElementById('sec-' + s).classList.remove('d-none');
+			document.getElementById('tab-' + s).classList.add('ativo');
+			if (s === 'clientes') carregarClientes();
+			if (s === 'contas') carregarContas();
+			if (s === 'transacoes') carregarTransacoes();
+			if (s === 'agencias') carregarAgencias();
+			}
+
+			async function carregarClientes() {
+			const res = await fetch('/api/clientes', { headers: h() });
+			const list = await res.json();
+			document.getElementById('tbClientes').innerHTML = list.map(c => `<tr>
+				<td>#${c.id}</td>
+				<td>${c.nome}</td>
+				<td>${c.cpf}</td>
+				<td>${c.email}</td>
+				<td>
+					<span class="badge-pill score-bronze">BRONZE</span>
+				</td>
+				<td>
+					<button class="btn-sm-acao btn-del" onclick="excluirCliente(${c.id})">Excluir</button>
+				</td>
+			</tr>`).join('');
+			}
+
+			async function carregarContas() {
+			const res = await fetch('/api/contas', { headers: h() });
+			const list = await res.json();
+			document.getElementById('tbContas').innerHTML = list.map(c => `<tr>
+				<td>#${c.id}</td>
+				<td>${c.numeroConta}</td>
+				<td>${c.nomeCliente || '—'}</td>
+				<td>${c.tipoConta}</td>
+				<td>R$ ${c.saldo.toLocaleString('pt-BR')}</td>
+				<td>${c.statusConta}</td>
+				<td>${new Date(c.dataAbertura).toLocaleDateString()}</td>
+			</tr>`).join('');
+			}
+
+			async function carregarTransacoes() {
+			const res = await fetch('/api/transacoes', { headers: h() });
+			const list = await res.json();
+			document.getElementById('tbTransacoes').innerHTML = list.map(t => `<tr>
+				<td>#${t.id}</td>
+				<td>${t.tipoTransacao}</td>
+				<td>R$ ${t.valor.toLocaleString('pt-BR')}</td>
+				<td>${new Date(t.dataHora).toLocaleString()}</td>
+				<td>${t.contaOrigemId}</td>
+				<td>${t.contaDestinoId || '—'}</td>
+			</tr>`).join('');
+			}
+
+			async function carregarAgencias() {
+			const res = await fetch('/api/agencias', { headers: h() });
+			const list = await res.json();
+			document.getElementById('tbAgencias').innerHTML = list.map(a => `<tr>
+				<td>#${a.id}</td>
+				<td>${a.nomeAgencia}</td>
+				<td>${a.endereco}</td>
+				<td>${a.cidade}</td>
+				<td>${a.estado}</td>
+			</tr>`).join('');
+			}
+
+			async function salvarCliente() {
+			const nome = document.getElementById('c_nome').value;
+			const cpf = document.getElementById('c_cpf').value;
+			const email = document.getElementById('c_email').value;
+			await fetch('/api/clientes', { method: 'POST', headers: h(), body: JSON.stringify({ nome, cpf, email }) });
+			bootstrap.Modal.getInstance(document.getElementById('modalCliente')).hide();
+			carregarClientes(); carregarStats();
+			}
+
+			async function excluirCliente(id) {
+			if (!confirm('Excluir cliente?')) return;
+			await fetch('/api/clientes/' + id, { method: 'DELETE', headers: h() });
+			carregarClientes(); carregarStats();
+			}
+		</script>
+	</body>
+</html>
