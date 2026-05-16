@@ -173,5 +173,38 @@ namespace BancoAPI.Api.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+        // ======================================================================
+        // 🌟 ROTA NOVA E EXCLUSIVA PARA O TOTEM INTERATIVO FORD INDIANA 🌟
+        // ======================================================================
+        [HttpPost("totem")]
+        [AllowAnonymous] // Permite que o Totem envie dados sem exigir Token/Login
+        public async Task<IActionResult> CreateFromTotem([FromBody] TotemDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Nome) || string.IsNullOrWhiteSpace(dto.Cpf))
+                return BadRequest("Nome e Modelo do Veículo são obrigatórios");
+
+            var cliente = new Cliente
+            {
+                Nome = dto.Nome.Trim(),
+                Cpf = dto.Cpf.Trim(), // Guarda o nome do Carro na coluna CPF do seu banco
+                Email = dto.Email?.Trim() ?? string.Empty,
+                Telefone = dto.Telefone?.Trim() ?? string.Empty, // Salva o WhatsApp na coluna certa de telefone!
+                SenhaHash = BCrypt.Net.BCrypt.HashPassword("123456") // Cria uma senha padrão segura
+            };
+
+            _context.Clientes.Add(cliente);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Agendamento realizado com sucesso no banco!" });
+        }
+
+        public class TotemDto
+        {
+            public string? Nome { get; set; }
+            public string? Cpf { get; set; } // Transportará o nome do Carro escolhido
+            public string? Email { get; set; }
+            public string? Telefone { get; set; } // Transportará o WhatsApp digitado
+        }
     }
 }
